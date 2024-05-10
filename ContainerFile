@@ -9,11 +9,12 @@ FROM quay.io/centos-bootc/centos-bootc:stream9
 # other tooling like Watchtower or explicit out-of-band control over container
 # updates via e.g. Ansible or other custom logic.
 
-RUN dnf -y install httpd  && \
-    systemctl enable httpd  && \
+RUN dnf -y install httpd && \
+    systemctl enable httpd && \
     mv /var/www /usr/share/www && \
     echo 'd /var/log/httpd 0700 - - -' > /usr/lib/tmpfiles.d/httpd-log.conf && \
-    sed -ie 's,/var/www,/usr/share/www,' /etc/httpd/conf/httpd.conf 
+    sed -ie 's,/var/www,/usr/share/www,' /etc/httpd/conf/httpd.conf
 RUN rm /usr/share/httpd/noindex -rf
+RUN mkdir /run/httpd
 COPY index.html /usr/share/www/html
 EXPOSE 80
