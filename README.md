@@ -106,7 +106,7 @@ Congrats you swapped an image!
 ### Issue 1: Compression:
 Sometimes I ran into an issue where ```bootc switch``` returned ```ERROR Switching: Pulling: Importing: Unhandled layer type: application/vnd.oci.image.layer.v1.tar+zstd ```. 
 
-If you ran into this, that means podman pushed your image as a zstd compressed image and bootc cannot recognize it. To fix it redo step 5's "podman push" and add the ```--compression-format=gzip ``` flag right after the "switch" command. 
+If you ran into this, that means podman pushed your image as a zstd compressed image and bootc cannot recognize it. To fix it redo step 5's "podman push" and add the ```--compression-format=gzip ``` flag right after the "push" command. 
 
 The zstd format may be supported in future versions of bootc, but for now, I'm hoping this saves someone some headaches that it caused me.
 
