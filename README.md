@@ -25,11 +25,13 @@ podman machine stop
 podman machine set --rootful
 podman machine start
 ```
+cd into the directory where you have this repo cloned\copied to.
+```
+cd <path_to_repo>
+```
+Configure a config.toml file to create your first user. In the provided template, you can rename that from "config-template.toml" to "config.toml".
 
-### Step 2: Create your ISO:
-Start by configuring a config.toml file to create your first user. In the provided template, you can rename that from "config-template.toml" to "config.toml".
-
-"config.toml"
+config.toml:
 ``` 
 [[customizations.user]]
 name = "admin"
@@ -37,32 +39,12 @@ password = "admin"
 key = "ssh-rsa AAA ... user@email.com"
 groups = ["wheel"] 
 ```
-After that, we need to cd into the directory where you have this repo copied to.
-```
-cd <path_to_repo>
-```
+
 Pull down the Centos image locally:
 ```
 podman pull quay.io/centos-bootc/centos-bootc:stream9
 ```  
-Run the following command to create your ISO
-``` 
-sudo podman run --rm  -it --privileged --pull=newer \
---security-opt label=type:unconfined_t \
--v /var/lib/containers/storage:/var/lib/containers/storage \
--v ./config/config.toml:/config.toml \
--v $(pwd)/output:/output \
-quay.io/centos-bootc/bootc-image-builder:latest \
---type anaconda-iso --rootfs xfs \
---local quay.io/centos-bootc/centos-bootc:stream9
-```
-
-### Step 3: Boot your machine:
-After the last step, you should have an install.iso file in your output/bootiso folder. Take that iso and load it on any bare metal VM or physical machine and it should load Centos Stream on your box.  
-
-If you left the config.toml file unchanged, your login should be "admin" with the password "admin"  
-### Step 4: Create a custom image:
-The whole point of bootc is to swap images and not just stay on this ISO version forever. The following will create a custom image that we will swap to with a simple webpage. 
+### Step 2: Create a custom image:
 
 Have podman take the Centos Stream image and apply our ContainerFile to the image:
 ```
@@ -73,8 +55,7 @@ View your new image with the following:
 podman images
 ```
 You should see a localhost/centos-bootc image with a "1.0" tag.
-
-### Step 5: Push Image to quay.io
+### Step 3: Push Image to quay.io
 The following assumes you already have a quay.io account. If not, go ahead and create an account at https://quay.io.
 
 Login to quay.io:
@@ -85,7 +66,52 @@ Push your local image to quay.io:
 ```
 podman push localhost/centos-bootc:1.0 quay.io/<username>/centos-bootc:1.0
 ```
-### Step 6: Swap your bootc Image:
+
+### Step 4: Create your ISO:
+
+Run the following command to create your ISO
+``` 
+sudo podman run --rm  -it --privileged --pull=newer \
+--security-opt label=type:unconfined_t \
+-v /var/lib/containers/storage:/var/lib/containers/storage \
+-v ./config/config.toml:/config.toml \
+-v $(pwd)/output:/output \
+quay.io/centos-bootc/bootc-image-builder:latest \
+--type anaconda-iso --rootfs xfs \
+--local quay.io/<username>/centos-bootc:1.0
+```
+
+### Step 5: Boot your machine:
+After the last step, you should have an install.iso file in your output/bootiso folder. Take that iso and load it on any bare metal VM or physical machine and it should load Centos Stream on your box.  
+
+If you left the config.toml file unchanged, your login should be "admin" with the password "admin"  
+
+browse to "http://<server_ip>" in a browser to verify your custom image is running a website. 
+### Step 6: Create a second custom image:
+Now we want to update our image to change the website some. Assume Containerfile2 has the changes you want to apply (just some new wording in index2.html).
+
+Have podman take the Centos Stream image and apply our ContainerFile to the image:
+```
+podman build --tag centos-bootc:1.1 -f ContainerFile2
+```
+View your new image with the following:
+```
+podman images
+```
+You should see a localhost/centos-bootc image with a "1.1" tag.
+
+### Step 7: Push New Image to quay.io
+The following assumes you already have a quay.io account. If not, go ahead and create an account at https://quay.io.
+
+Login to quay.io:
+```
+podman login quay.io
+```
+Push your local image to quay.io:
+```
+podman push localhost/centos-bootc:1.1 quay.io/<username>/centos-bootc:1.1
+```
+### Step 8: Swap your bootc Image:
 Login to the machine you imaged with your ISO back on step 3 and double verify what image your machine is currently :
 ```
 bootc status
@@ -98,9 +124,9 @@ bootc switch quay.io/<username>/centos-bootc:1.0
 ```
 If your run your bootc status again, you should see your image has changed and it's "staging" image to your new image.
 
-Reboot your server and browse to "http://<server_ip>" in a browser to verify your custom image is running a website. 
+Reboot your server and browse to "http://<server_ip>" in a browser to verify your custom image is running your updated website. 
 
-Congrats you swapped an image!
+Congratulations! you swapped an image!
 
 ## Troubleshooting:
 ### Issue 1: Compression:
