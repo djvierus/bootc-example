@@ -7,7 +7,7 @@ I also am going to be using the anaconda iso installer vs the qcow2 method of im
 **PLEASE USE WSL ON WINDOWS IF USING A WINDOWS BOX FOR THIS EXAMPLE**  
 I have had much more success using WSL on Windows when following the Centos Bootc examples vs Podman Desktop. To get to WSL on Windows (Assuming you already have it installed), bring up a terminal and type the following: 
    
-Windows Only:  
+Windows Only (Install Podman Desktop or CLI if you haven't yet):  
 ```
 wsl
 ```
@@ -16,8 +16,12 @@ wsl
 ### Step 1: Setup the Environment:
 Install qemu to be able to build ISO (You may need a differnt qemu version installed if you are not working with an x86_64 system):
 ```
-sudo dnf install qemu-img qemu-system-x86_64
+sudo dnf install qemu-img qemu
 ```  
+Create the podman machine if not already setup: 
+```
+podman machine init
+```   
 
 Ensure podman is running it's machine in a rootful state
 ```
