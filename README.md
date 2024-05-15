@@ -124,7 +124,7 @@ You should see something similar to: "image: quay.io/centos-bootc/centos-bootc:s
 
 Swap your bootc image to your custom image:
 ```
-bootc switch quay.io/<username>/centos-bootc:1.0
+bootc switch quay.io/<username>/centos-bootc:1.1
 ```
 If your run your bootc status again, you should see your image has changed and it's "staging" image to your new image.
 
