@@ -73,6 +73,10 @@ podman push localhost/centos-bootc:1.0 quay.io/<username>/centos-bootc:1.0
 
 ### Step 4: Create your ISO:
 
+Ensure your root user can see the local container image.  
+``` 
+sudo podman pull quay.io/<username>/centos-bootc:1.0
+```
 Run the following command to create your ISO
 ``` 
 sudo podman run --rm  -it --privileged --pull=newer \
